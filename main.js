@@ -1,3 +1,5 @@
+//quede min 3015
+
 const tasks=[];
 let time=0;
 let timer = null;
@@ -7,6 +9,10 @@ let current  = null;
 const bAdd = document.querySelector("#bAdd");
 const itTask = document.querySelector("#itTask");
 const form = document.querySelector("#form");
+const taskName = document.querySelector('#time #taskName');
+
+renderTime();
+renderTask();
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -37,7 +43,7 @@ function renderTask(){
             <div class="completed">${
                 task.completed 
                 ? `<span class="done">Done</span>` 
-                : `<button class= "star-button" data-id= "${task.id}">Start</button>`
+                : `<button class= "start-button" data-id= "${task.id}">Start</button>`
             } </div>
             <div class="title"> ${task.title} </div>
         </div>
@@ -62,13 +68,65 @@ function renderTask(){
 
 }
 function startButtonsHandler(id){
-    time = 25*60;
+    time = 5;
     current= id;
-    const taskIndex = tasks.findIndex( task => task.id == id);
-    const taskName = document.querySelector('#time #taskName');
+    const taskIndex = tasks.findIndex( task => task.id === id);
+    
     taskName.textContent= tasks[taskIndex].title;
+    renderTime()
+    timer= setInterval(()=>{
+        timeHandler(id)
+
+    },1000)
+
+}
+function timeHandler(id){
+    time--
+    renderTime()
+
+    if(time===0){
+        clearInterval(timer)
+        markCompleted(id)
+        timer= null
+        renderTask()
+        startBreak()
+    }
+
+}
+function renderTime(){
+    const timeDiv= document.querySelector('#time #value')
+    const minutos= parseInt(time/60)
+    const seconds= parseInt(time%60)
+
+    timeDiv.textContent=`${minutos < 10 ? '0' : ''}${minutos}:${seconds < 10 ? '0' : ''}${seconds}`
 
 }
 
+function markCompleted(id){
+    const taskIndex = tasks.findIndex( (task) => task.id === id);
+    tasks[taskIndex].completed= true
+}
 
+function startBreak(){
+    time = 5
+    taskName.textContent= 'Break'
+    renderTime()
+    timerBreak = setInterval(()=>{
+        timerBreakhandler()
+    }, 1000)
+}
 
+function timerBreakhandler(){
+    time--
+    renderTime()
+
+    if(time===0){
+        clearInterval(timerBreak)
+        current= null
+        timer=null
+        timerBreak=null
+        taskName.textContent=''
+        renderTask()
+
+    }
+}
